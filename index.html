@@ -3,14 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тестовое задание</title>
-    <style>
-        h1 {
-            color: #42a5f5; /* Голубой цвет через CSS */
-        }
-    </style>
+    <title>Калькулятор рассчета спирта</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Hello World!</h1> <!-- Или так -->
+    <h1>Калькулятор рассчета спирта</h1>
+    
+    <div class="calculator-container">
+        <div class="calculator">
+            <h2 class="calculator-title">От спирта к ингредиентам</h2>
+            
+            <div class="input-group">
+                <label>Режим расчета:</label>
+                <div class="mode-switch">
+                    <input type="radio" id="mode-quantity" name="calculation-mode" value="quantity" checked onchange="switchCalculationMode()">
+                    <label for="mode-quantity">По количеству спирта</label>
+                    <input type="radio" id="mode-time" name="calculation-mode" value="time" onchange="switchCalculationMode()">
+                    <label for="mode-time">По времени работы</label>
+                </div>
+            </div>
+            
+            <div id="quantity-inputs">
+                <div class="input-group">
+                    <label for="target-alcohol">Нужное количество спирта (л, 100%):</label>
+                    <input type="number" id="target-alcohol" step="0.1" min="0" placeholder="Количество спирта">
+                </div>
+            </div>
+            
+            <div id="time-inputs" style="display: none;">
+                <div class="input-group">
+                    <label for="working-days">Время работы (дни):</label>
+                    <input type="number" id="working-days" step="1" min="0" placeholder="Количество дней">
+                </div>
+                <div class="input-group">
+                    <label for="working-hours-per-day">Часов работы в день:</label>
+                    <input type="number" id="working-hours-per-day" step="1" min="1" max="24" placeholder="Часов в день" value="24">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="columns-count">Количество колон:</label>
+                <select id="columns-count">
+                    <option value="1">1 колона</option>
+                    <option value="2">2 колоны</option>
+                    <option value="3">3 колоны</option>
+                    <option value="4">4 колоны</option>
+                    <option value="5">5 колон</option>
+                    <option value="6">6 колон</option>
+                    <option value="7">7 колон</option>
+                    <option value="8">8 колон</option>
+                    <option value="9">9 колон</option>
+                    <option value="10">10 колон</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="alcohol-price">Цена спирта за литр (руб):</label>
+                <input type="number" id="alcohol-price" step="0.1" min="0" placeholder="Цена за литр" value="550">
+            </div>
+            
+            <div class="input-group">
+                <label class="price2">Цены (руб):</label>
+                <div class="two-columns">
+                    <div>
+                        <label for="general-qty">Сахар (кг):</label>
+                        <input type="number" id="sugar-price2" step="0.1" min="0" placeholder="Сахар за кг" value="55">
+                    </div>
+                    <div>
+                        <label for="general-qty">Дрожжи (пачка 0.5):</label>
+                        <input type="number" id="yeast-price2" step="0.1" min="0" placeholder="Дрожжи за упак." value="190">
+                    </div>
+                </div>
+                <div class="two-columns" style="margin-top: 5px;">
+                    <div>
+                        <label for="general-qty">Вода (л):</label>
+                        <input type="number" id="water-price2" step="0.1" min="0" placeholder="Вода за литр" value="0">
+                    </div>
+                    <div>
+                        <label for="general-qty">Баллон газа:</label>
+                        <input type="number" id="gas-price2" step="0.1" min="0" placeholder="Баллон газа" value="1400">
+                    </div>
+                </div>
+                <div class="two-columns" style="margin-top: 5px;">
+                    <div>
+                        <label for="general-qty">Цена за кВт/ч:</label>
+                        <input type="number" id="electricity-price2" step="0.1" min="0" placeholder="Цена за кВт·ч" value="8.13">
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="calculateFromAlcohol()">Рассчитать ингредиенты</button>
+            
+            <div id="alcohol-result" class="result">
+                <h3>Потребуется:</h3>
+                <div id="alcohol-output-info" class="result-item" style="display: none;">
+                    <b>Количество спирта за указанное время: <span id="alcohol-output-amount" class="price"></span> л (100%)</b>
+                </div>
+                <div class="result-item">
+                    Сахар: <span id="required-sugar" class="price"></span> кг 
+                    (<span id="required-sugar-price" class="price"></span> руб)
+                </div>
+                <div class="result-item">
+                    Вода: <span id="required-water" class="price"></span> л 
+                    (<span id="required-water-price" class="price"></span> руб)
+                </div>
+                <div class="result-item">
+                    Дрожжи: <span id="required-yeast" class="price"></span> кг или <span id="required-yeast2" class="price"></span> пачек
+                    (<span id="required-yeast-price" class="price"></span> руб)
+                </div>
+                <div class="result-item">
+                    Брага: <span id="required-wash" class="price"></span> л
+                </div>
+                <div class="result-item">
+                    Газ: <span id="required-gas" class="price"></span> баллонов 
+                    (<span id="required-gas-price" class="price"></span> руб)
+                </div>
+                <div class="result-item">
+                    Время перегонки: 
+                    <span id="required-time" class="price"></span> часов (<span id="speed-per-hour" class="price"></span> л спирта/час) или 
+                    <span id="required-days" class="price"></span> суток 
+                    <span id="remaining-hours" class="price"></span> часов
+                </div>
+                <div class="result-item">
+                    Электричество: <span id="required-electricity" class="price"></span> кВт·ч 
+                    (<span id="required-electricity-price" class="price"></span> руб)
+                </div>
+                <div class="result-item" style="margin-top: 15px; font-weight: bold; border-top: 1px solid #b3d4ed; padding-top: 10px;">Итог:</div>
+                <div class="result-item" style="margin-top: 15px; font-weight: bold; border-top: 1px solid #b3d4ed; padding-top: 10px;">
+                    Общие затраты: <span id="total-required-cost" class="price"></span> руб
+                </div>
+                <div class="result-item" style="font-weight: bold;">
+                    Себестоимость 1 л спирта: <span id="cost-per-liter-result" class="price"></span> руб
+                </div>
+                <div class="result-item" style="font-weight: bold;">
+                    Общая стоимость спирта: <span id="total-alcohol-value" class="price"></span> руб
+                </div>
+                <div class="result-item" style="font-weight: bold;">
+                    Чистая прибыль: <span id="net-profit" class="price"></span> руб
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>

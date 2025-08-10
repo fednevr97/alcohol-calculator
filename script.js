@@ -2,7 +2,7 @@
 const CONSTANTS = {
   // Параметры алкоголя
   ALCOHOL: {
-    YIELD_PER_KG_SUGAR: 0.5, // Теоретический выход спирта из 1 кг сахара (л)
+    YIELD_PER_KG_SUGAR: 0.45, // Теоретический выход спирта из 1 кг сахара (л)
   },
   // Параметры браги
   WASH: {
@@ -11,7 +11,7 @@ const CONSTANTS = {
   },
   // Параметры дрожжей
   YEAST: {
-    PER_KG_SUGAR: 30, // Количество дрожжей на 1 кг сахара (г)
+    PER_KG_SUGAR: 25, // Количество дрожжей на 1 кг сахара (г)
   },
   // Параметры газа
   GAS: {
@@ -35,7 +35,7 @@ function switchCalculationMode() {
   const timeMode = document.getElementById('mode-time');
   const quantityInputs = document.getElementById('quantity-inputs');
   const timeInputs = document.getElementById('time-inputs');
-  
+
   if (quantityMode.checked) {
     quantityInputs.style.display = 'block';
     timeInputs.style.display = 'none';
@@ -48,7 +48,7 @@ function switchCalculationMode() {
 // Функция обратного расчета (от спирта к ингредиентам)
 function calculateFromAlcohol() {
   const quantityMode = document.getElementById('mode-quantity').checked;
-  
+
   if (quantityMode) {
     calculateByQuantity();
   } else {
@@ -82,17 +82,17 @@ function calculateByQuantity() {
   const requiredYeastKg = requiredYeastGrams / 1000;
   const requiredWash = requiredSugar * CONSTANTS.WASH.LITERS_PER_KG_SUGAR;
   const requiredGas = requiredSugar / CONSTANTS.GAS.SUGAR_PER_CYLINDER;
-  
+
   // Расчет времени перегонки с учетом количества колон
   const baseTimePerLiter = CONSTANTS.DISTILLATION.TIME_PER_LITER;
   const timePerLiter = baseTimePerLiter / columnsCount; // Время уменьшается при увеличении колон
   const requiredTime = targetAlcohol * timePerLiter;
   const requiredDays = Math.floor(requiredTime / 24); // Целое количество суток
   const remainingHours = Math.round(requiredTime % 24); // Оставшиеся часы
-  
+
   // Расчет скорости отбора спирта в час
   const speedPerHour = columnsCount; // 1 л/час для 1 колоны, 2 л/час для 2 колон
-  
+
   // Расчет потребления электричества с учетом количества колон
   const basePowerPerHour = CONSTANTS.DISTILLATION.POWER_PER_HOUR;
   const powerPerHour = basePowerPerHour * columnsCount; // Потребление увеличивается при увеличении колон
@@ -156,9 +156,10 @@ function calculateByQuantity() {
 function calculateByTime() {
   // Получаем время работы
   const workingDays = parseFloat(document.getElementById('working-days').value) || 0;
-  const workingHoursPerDay = parseFloat(document.getElementById('working-hours-per-day').value) || 24;
+  const workingHoursPerDay =
+    parseFloat(document.getElementById('working-hours-per-day').value) || 24;
   const totalWorkingHours = workingDays * workingHoursPerDay;
-  
+
   // Получаем количество колон
   const columnsCount = parseInt(document.getElementById('columns-count').value) || 1;
   // Получаем цену спирта за литр
@@ -186,7 +187,7 @@ function calculateByTime() {
   const requiredYeastKg = requiredYeastGrams / 1000;
   const requiredWash = requiredSugar * CONSTANTS.WASH.LITERS_PER_KG_SUGAR;
   const requiredGas = requiredSugar / CONSTANTS.GAS.SUGAR_PER_CYLINDER;
-  
+
   // Расчет потребления электричества
   const basePowerPerHour = CONSTANTS.DISTILLATION.POWER_PER_HOUR;
   const powerPerHour = basePowerPerHour * columnsCount;
